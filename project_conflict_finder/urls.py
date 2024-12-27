@@ -19,6 +19,8 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path,include
 
 urlpatterns = [
@@ -29,3 +31,6 @@ urlpatterns = [
     path('api/', include("core.urls")),
      path('user/', include("user.urls"))
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
