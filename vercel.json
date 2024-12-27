@@ -5,7 +5,7 @@
         "src": "project_conflict_finder/wsgi.py",
         "use": "@vercel/python",
         "config": {
-          "maxLambdaSize": "15mb",
+          "maxLambdaSize": "512mb",
           "runtime": "Python3.9"
         }
       },
