@@ -9,7 +9,7 @@ class ProjectsSerializer(serializers.ModelSerializer):
     user = UserInfoSerializer(read_only=True)
     class Meta:
         model = Projects
-        fields = ['title','frontend_tech','backend_tech','user','desc','status']
+        fields = ['id','title','frontend_tech','backend_tech','user','desc','status']
         read_only_fields = ['user']
     
 
