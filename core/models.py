@@ -14,7 +14,7 @@ class Projects(BaseModel):
     frontend_tech = models.CharField(max_length=255)
     backend_tech = models.CharField(max_length=255)
     desc = models.TextField()
-    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     status = models.CharField(max_length=255,choices=STATUS,default='Pending')
     keywords = models.CharField(max_length=255)
 

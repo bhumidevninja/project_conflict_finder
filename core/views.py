@@ -15,7 +15,7 @@ class ProjectsViewSet(ModelViewSet):
     serializer_class = ProjectsSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ["status", "user_id"]
+    filterset_fields = ["status", "user"]
     search_fields = ["title", "desc", "keywords"]
     ordering_fields = ["created_at", "updated_at", "title"]
     ordering = ["created_at"]

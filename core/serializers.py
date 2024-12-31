@@ -2,12 +2,15 @@ from rest_framework import serializers
 from .models import Projects
 from django.utils import timezone
 from core.utils.keyword_genrator import generate_keywords
-from core.utils.conflict_analyzer import get_similarities,get_suggestions
+from user.serializers import UserInfoSerializer
+from core.utils.conflict_analyzer import get_similarities
 
 class ProjectsSerializer(serializers.ModelSerializer):
+    user = UserInfoSerializer(read_only=True)
     class Meta:
         model = Projects
-        fields = ['title','frontend_tech','backend_tech','desc','status']
+        fields = ['title','frontend_tech','backend_tech','user','desc','status']
+        read_only_fields = ['user']
     
 
     def validate(self, attrs):
@@ -29,5 +32,5 @@ class ProjectsSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):    
         validated_data['keywords'] = generate_keywords(validated_data.get("desc"))
-        validated_data['user_id'] = self.context['request'].user
+        validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
