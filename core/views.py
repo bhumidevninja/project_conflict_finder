@@ -14,3 +14,5 @@ class ProjectsViewSet(ModelViewSet):
     search_fields = ['title', 'desc', 'keywords'] 
     ordering_fields = ['created_at', 'updated_at', 'title']  
     ordering = ['created_at']
+
+    
