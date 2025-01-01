@@ -36,26 +36,22 @@ class ProjectsViewSet(ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         try:
-            # Extract the project instance from the URL and user from request
+            # Extract the project instance from the URL
             project = self.get_object()
 
-            # Get the 'status' from the request data
-            status_value = request.data.get("status")
+            # Check if the update is partial
+            partial = kwargs.pop('partial', False)
 
-            # Validate that the status is provided and is valid
-            if not status_value:
-                raise ValidationError("The 'status' field is required.")
-            
-            valid_statuses = [status[0] for status in Projects.STATUS]
-            if status_value not in valid_statuses:
-                raise ValidationError(f"Invalid status: '{status_value}'. Valid choices are: {valid_statuses}")
+            # Pass the project instance and request data to the serializer
+            serializer = self.get_serializer(project, data=request.data, partial=partial)
 
-            # Update the status
-            project.status = status_value
-            project.save()
+            # Validate the data using the serializer
+            serializer.is_valid(raise_exception=True)
 
-            # Serialize the updated project and return the response
-            serializer = self.get_serializer(project)
+            # Save the validated data
+            self.perform_update(serializer)
+
+            # Return the serialized project data
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except ValidationError as e:
