@@ -25,3 +25,5 @@ six==1.17.0
 sqlparse==0.5.3
 threadpoolctl==3.5.0
 urllib3==2.3.0
+django-cors-headers==4.0.0
+groq==0.13.1

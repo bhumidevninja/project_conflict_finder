@@ -26,6 +26,14 @@ class ProjectsViewSet(ModelViewSet):
         context["request"] = self.request
         return context
 
+    def list(self, request, *args, **kwargs):
+        if request.user.is_superuser:
+            project = Projects.objects.all()
+        else:
+            project = Projects.objects.filter(user=request.user)
+        serializer = ProjectsSerializer(project, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def update(self, request, *args, **kwargs):
         try:
             # Extract the project instance from the URL and user from request

@@ -7,7 +7,7 @@ API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/par
 
 def get_similarity_score(new_desc, existing_descs, retries=3, delay=5, timeout=120):
     API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/paraphrase-MiniLM-L6-v2"
-    HEADERS = {"Authorization": f"Bearer {os.getenv("HUGGING_FACE_TOKEN")}"}
+    HEADERS = {"Authorization": f"Bearer {os.getenv('HUGGING_FACE_TOKEN')}"}
     
     # Prepare the payload where we are comparing new_desc with each existing_desc
     payload = {
