@@ -1,4 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAdminUser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -6,9 +8,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
-from .models import Projects
+from .models import Projects,ProjectComment
 from core.utils.conflict_analyzer import get_suggestions
-from .serializers import ProjectsSerializer
+from .serializers import ProjectsSerializer,ProjectCommentSerializer
 
 
 class ProjectsViewSet(ModelViewSet):
@@ -85,4 +87,41 @@ class ProjectsViewSet(ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    
+
+class ProjectCommentAPIView(APIView):
+    permission_classes = [IsAdminUser]  
+
+    def post(self, request):
+        try:
+            # Get the comment text from the request
+            project_id = request.data.get('project')
+            comment_text = request.data.get('comment')
+            # Retrieve the project
+            project = Projects.objects.get(id=project_id)
+
+            if not comment_text:
+                return Response(
+                    {"detail": "Comment text is required."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Create the comment
+            comment_instance = ProjectComment.objects.create(
+                project=project,
+                comment=comment_text
+            )
+
+            # Serialize and return the created comment
+            serializer = ProjectCommentSerializer(comment_instance)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except Projects.DoesNotExist:
+            return Response(
+                {"detail": "Project not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"detail": "An error occurred.", "error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

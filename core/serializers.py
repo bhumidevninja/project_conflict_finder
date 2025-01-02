@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Projects
+from .models import Projects,ProjectComment
 from django.utils import timezone
 from core.utils.keyword_genrator import generate_keywords
 from user.serializers import UserInfoSerializer
@@ -61,3 +61,10 @@ class ProjectsSerializer(serializers.ModelSerializer):
         validated_data['keywords'] = generate_keywords(validated_data.get("desc"))
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+
+class ProjectCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectComment
+        fields = ['id', 'comment','project', 'created_at', 'updated_at']
+
