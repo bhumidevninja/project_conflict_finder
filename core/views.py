@@ -9,10 +9,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
-from .models import Projects,ProjectComment
+from .models import Projects, ProjectComment
 from core.models import CustomUser
 from core.utils.conflict_analyzer import get_suggestions
-from .serializers import ProjectsSerializer,ProjectCommentSerializer
+from .serializers import ProjectsSerializer, ProjectCommentSerializer
 
 
 class ProjectsViewSet(ModelViewSet):
@@ -44,10 +44,12 @@ class ProjectsViewSet(ModelViewSet):
             project = self.get_object()
 
             # Check if the update is partial
-            partial = kwargs.pop('partial', False)
+            partial = kwargs.pop("partial", False)
 
             # Pass the project instance and request data to the serializer
-            serializer = self.get_serializer(project, data=request.data, partial=partial)
+            serializer = self.get_serializer(
+                project, data=request.data, partial=partial
+            )
 
             # Validate the data using the serializer
             serializer.is_valid(raise_exception=True)
@@ -64,8 +66,11 @@ class ProjectsViewSet(ModelViewSet):
         except Exception as e:
             # Catch all other exceptions
             return Response(
-                {"detail": "An error occurred while processing your request.", "error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {
+                    "detail": "An error occurred while processing your request.",
+                    "error": str(e),
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
     @action(detail=False, methods=["post"])
@@ -91,43 +96,37 @@ class ProjectsViewSet(ModelViewSet):
 
 
 class ProjectCommentAPIView(APIView):
-    permission_classes = [IsAdminUser]  
-    
-    def post(self, request):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, project_id):
         try:
-            # Get the comment text from the request
-            project_id = request.data.get('project')
-            comment_text = request.data.get('comment')
-            # Retrieve the project
+            comment_text = request.data.get("comment")
+
             project = Projects.objects.get(id=project_id)
 
             if not comment_text:
                 return Response(
                     {"detail": "Comment text is required."},
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # Create the comment
             comment_instance = ProjectComment.objects.create(
-                project=project,
-                comment=comment_text
+                project=project, comment=comment_text
             )
 
-            # Serialize and return the created comment
             serializer = ProjectCommentSerializer(comment_instance)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         except Projects.DoesNotExist:
             return Response(
-                {"detail": "Project not found."},
-                status=status.HTTP_404_NOT_FOUND
+                {"detail": "Project not found."}, status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
             return Response(
                 {"detail": "An error occurred.", "error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-    
+
     def get(self, request, project_id):
         try:
             # Retrieve the project
@@ -142,21 +141,20 @@ class ProjectCommentAPIView(APIView):
 
         except Projects.DoesNotExist:
             return Response(
-                {"detail": "Project not found."},
-                status=status.HTTP_404_NOT_FOUND
+                {"detail": "Project not found."}, status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
             return Response(
                 {"detail": "An error occurred.", "error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 
 class DashboardAPIView(ListAPIView):
-    permission_classes = [IsAdminUser] 
+    permission_classes = [IsAdminUser]
 
     def list(self, request, *args, **kwargs):
-        try:            
+        try:
             dashboard_data = {
                 "total_users": CustomUser.objects.total_user(),
                 "total_projects": Projects.objects.total_projects(),
@@ -165,10 +163,13 @@ class DashboardAPIView(ListAPIView):
                 "pending_projects": Projects.objects.pending(),
             }
 
-            return Response(dashboard_data)
+            return Response(dashboard_data, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response(
-                {"detail": "An error occurred while fetching dashboard data.", "error": str(e)},
-                status=500
+                {
+                    "detail": "An error occurred while fetching dashboard data.",
+                    "error": str(e),
+                },
+                status=500,
             )
