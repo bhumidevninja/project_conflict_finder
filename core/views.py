@@ -2,6 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -9,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
 from .models import Projects,ProjectComment
+from core.models import CustomUser
 from core.utils.conflict_analyzer import get_suggestions
 from .serializers import ProjectsSerializer,ProjectCommentSerializer
 
@@ -90,7 +92,7 @@ class ProjectsViewSet(ModelViewSet):
 
 class ProjectCommentAPIView(APIView):
     permission_classes = [IsAdminUser]  
-
+    
     def post(self, request):
         try:
             # Get the comment text from the request
@@ -124,4 +126,49 @@ class ProjectCommentAPIView(APIView):
             return Response(
                 {"detail": "An error occurred.", "error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def get(self, request, project_id):
+        try:
+            # Retrieve the project
+            project = Projects.objects.get(id=project_id)
+
+            # Get all comments for the project
+            comments = project.comments.all()
+
+            # Serialize the comments
+            serializer = ProjectCommentSerializer(comments, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Projects.DoesNotExist:
+            return Response(
+                {"detail": "Project not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"detail": "An error occurred.", "error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class DashboardAPIView(ListAPIView):
+    permission_classes = [IsAdminUser] 
+
+    def list(self, request, *args, **kwargs):
+        try:            
+            dashboard_data = {
+                "total_users": CustomUser.objects.total_user(),
+                "total_projects": Projects.objects.total_projects(),
+                "approved_projects": Projects.objects.approved(),
+                "rejected_projects": Projects.objects.rejected(),
+                "pending_projects": Projects.objects.pending(),
+            }
+
+            return Response(dashboard_data)
+
+        except Exception as e:
+            return Response(
+                {"detail": "An error occurred while fetching dashboard data.", "error": str(e)},
+                status=500
             )

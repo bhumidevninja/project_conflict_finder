@@ -1,13 +1,19 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path
-from .views import ProjectsViewSet,ProjectCommentAPIView
+from .views import ProjectsViewSet, ProjectCommentAPIView,DashboardAPIView
 
 
 router = DefaultRouter()
-router.register(r'projects', ProjectsViewSet, basename='projects')
+router.register(r"projects", ProjectsViewSet, basename="projects")
 
 urlpatterns = [
-     path('project-comment/', ProjectCommentAPIView.as_view(), name='project-comment'),
+    path("project-comment/", ProjectCommentAPIView.as_view(), name="project-comment"),
+    path(
+        "project-comment/<uuid:project_id>/",
+        ProjectCommentAPIView.as_view(),
+        name="get-project-comments",
+    ),
+    path("dashboard/", DashboardAPIView.as_view(), name="dashboard"),
 ]
 
 urlpatterns += router.urls

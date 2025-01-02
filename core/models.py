@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from user.models import CustomUser
 from django.utils.timezone import now
 from core.utils.conflict_analyzer import get_similarities
-
+from .manager import ProjectManager
 
 class Projects(BaseModel):
    
@@ -20,6 +20,8 @@ class Projects(BaseModel):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     status = models.CharField(max_length=255,choices=STATUS,default='Pending')
     keywords = models.CharField(max_length=255)
+
+    objects = ProjectManager() 
 
     def clean(self):
         # Validate status
