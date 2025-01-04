@@ -7,6 +7,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
+from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework.response import Response
 from .models import Projects, ProjectComment
@@ -153,6 +156,8 @@ class ProjectCommentAPIView(APIView):
 class DashboardAPIView(ListAPIView):
     permission_classes = [IsAdminUser]
 
+    @method_decorator(cache_page(60))
+    @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         try:
             dashboard_data = {

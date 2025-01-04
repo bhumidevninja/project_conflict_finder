@@ -5,11 +5,18 @@ from core.utils.keyword_genrator import generate_keywords
 from user.serializers import UserInfoSerializer
 from core.utils.conflict_analyzer import get_similarities
 
+
+class ProjectCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectComment
+        fields = ['id', 'comment','project', 'created_at']
+
 class ProjectsSerializer(serializers.ModelSerializer):
     user = UserInfoSerializer(read_only=True)
+    comments = ProjectCommentSerializer(many=True, read_only=True)
     class Meta:
         model = Projects
-        fields = ['id','title','frontend_tech','backend_tech','user','desc','status']
+        fields = ['id','title','frontend_tech','backend_tech','user','desc','status','comments']
         read_only_fields = ['user']
     
     def validate_status(self, value):
@@ -63,8 +70,4 @@ class ProjectsSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class ProjectCommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProjectComment
-        fields = ['id', 'comment','project', 'created_at', 'updated_at']
 
