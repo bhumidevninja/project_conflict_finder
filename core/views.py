@@ -136,7 +136,7 @@ class ProjectCommentAPIView(APIView):
             project = Projects.objects.get(id=project_id)
 
             # Get all comments for the project
-            comments = project.comments.all()
+            comments = project.comments.all().order_by('created_at')
 
             # Serialize the comments
             serializer = ProjectCommentSerializer(comments, many=True)
@@ -154,7 +154,7 @@ class ProjectCommentAPIView(APIView):
 
 
 class DashboardAPIView(ListAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     @method_decorator(cache_page(60))
     @method_decorator(vary_on_cookie)

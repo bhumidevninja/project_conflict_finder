@@ -68,3 +68,6 @@ class ProjectComment(BaseModel):
 
     def __str__(self):
         return f"Comment on {self.project.title}"
+
+    class Meta:
+        ordering = ['-created_at']

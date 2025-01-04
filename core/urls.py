@@ -7,7 +7,7 @@ router = DefaultRouter()
 router.register(r"projects", ProjectsViewSet, basename="projects")
 
 urlpatterns = [
-    path("project-comment/<uuid:project_id>/", ProjectCommentAPIView.as_view(), name="project-comment"),
+    path("project-comment/<str:project_id>/", ProjectCommentAPIView.as_view(), name="project-comment"),
     path("dashboard/", DashboardAPIView.as_view(), name="dashboard"),
 ]
 
