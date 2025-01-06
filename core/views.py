@@ -156,8 +156,8 @@ class ProjectCommentAPIView(APIView):
 class DashboardAPIView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
-    @method_decorator(cache_page(60))
-    @method_decorator(vary_on_cookie)
+    # @method_decorator(cache_page(60))
+    # @method_decorator(vary_on_cookie)
     def list(self, request, *args, **kwargs):
         try:
             dashboard_data = {
